@@ -1,66 +1,98 @@
 #!/usr/bin/env python3
 
+import operator
+
 class BrookshearMachine():
 
-	def __init__():
+	def __init__(self):
+		self.pc= ''
+		self.ir=''
+		self.memory=dict()
+		self.registers={'0'=0, '1'=0, '2'=0, '3'=0, '4'=0, '5'=0,
+						'6'=0, '7'=0, '8'=0, '9'=0, 'A'=0, 'B'=0,
+						'C'=0, 'D'=0, 'E'=0, 'F'=0}
 		pass
 
-	def load(r, x, y):
+	def setPC(self, value):
+		if value[0] == ['A'-'F'] or value[0] == ['0'-'9']:
+			if value[1] == ['A'-'F'] or value[1] == ['0'-'9']:
+				self.pc=value
+
+	def setIR(self, value):
+		if 'int' in type(value):
+			if value <= 15:
+				self.ir = value
+
+	def load(self, r, x, y):
 		'''
 		LOAD the register R with bit pattern XY
 		'''
+		self.registers[str(r)] == str(x+y)
 		pass
 
-	def memLoad(r, x, y):
+	def memLoad(self, r, x, y):
 		'''
 		LOAD the register R with bit pattern found in the memory cell at XY
 		'''
-		pass
+		self.registers[str(r)] = self.memory[str(x+y)]
 
-	def store(r, x, y):
+	def store(self, r, x, y):
 		'''
-		STORE thebit pattern found in register R in the memory cell at XY
+		STORE the bit pattern found in register R in the memory cell at XY
 		'''
-		pass
+		self.memory[str(x+y)] = self.registers[str(r)]
 
-	def move(r, s):
+	def move(self, r, s):
 		'''
 		MOVE the bit pattern found in register R to register S
 		'''
-		pass
+		self.registers[str(r)] = self.registers[str(s)]
+		self.registers[str(s)] = 0
 
-	def add(r, s, t):
+	def add(self, r, s, t):
 		'''
 		ADD the bit patterns in registers S & T as though they were two's
 		complement representation & leave the result in register R
 		'''
-		pass
+		temp = s + t
+		if temp > 255:
+			temp = 0
+		self.registers[str(r)] = temp
 
-	def bmOr(r, s, t):
+	def bmOr(self, r, s, t):
 		'''
-		OR the bit patternsin registers S and t and place the result in register R
+		OR the bit patterns in registers S and t and place the result in register R
 		'''
-		pass
+		temp = bin(s) or bin(t)
+		if temp > 255:
+			temp = 0
+		self.registers[str(r)] = temp
 
-	def bmAnd(r, s, t):
+	def bmAnd(self, r, s, t):
 		'''
 		AND the bit patterns in register S and T and place the result in register R
 		'''
-		pass
+		temp = bin(s) and bin(t)
+		if temp > 255:
+			temp = 0
+		self.registers[str(r)] = temp
 
-	def xor(r, s, t):
+	def xor(self, r, s, t):
 		'''
 		XOR the bit patterns in register S and T and place theresult in register R
 		'''
-		pass
+		temp = operator.xor(s, t)
+		if temp > 255:
+			temp = 0
+		self.registers[str(r)] = temp
 
-	def rotate(r, x):
+	def rotate(self, r, x):
 		'''
 		ROTATE the bit pattern in register R one bit to the right X times
 		'''
 		pass
 
-	def jump(r, x, y):
+	def jump(self, r, x, y):
 		'''
 		JUMP to the instruction located in the memory cell at address XY if
 		the bit pattern in register R is equal to the bit pattern in register 0,
@@ -68,20 +100,56 @@ class BrookshearMachine():
 		'''
 		pass
 
-	def halt(r, x, y):
+	def halt(self, r, x, y):
 		'''
 		HALT execution
 		'''
 		pass
 
-	def fetch():
+	def fetch(self):
 		pass
 
-	def increment():
+	def increment(self):
+		self.ir += 2
+
+	def decode(self):
 		pass
 
-	def decode():
+	def execute(self):
+		if self.ir[0] == '1':
+			pass
+		elif self.ir[0] == '2':
+			pass
+		elif self.ir[0] == '3':
+			pass
+		elif self.ir[0] == '4':
+			pass
+		elif self.ir[0] == '5':
+			pass
+		elif self.ir[0] == '6':
+			pass
+		elif self.ir[0] == '7':
+			pass
+		elif self.ir[0] == '8':
+			pass
+		elif self.ir[0] == '9':
+			pass
+		elif self.ir[0] == 'A':
+			pass
+		elif self.ir[0] == 'B':
+			pass
+		elif self.ir[0] == 'C':
+			pass
+		elif self.ir[0] == 'D':
+			pass
+		elif self.ir[0] == 'E':
+			pass
+		elif self.ir[0] == 'F':
+			pass
 		pass
 
-	def execute():
-		pass
+	def run(self):
+		self.fetch()
+		self.increment()
+		self.decode()
+		self.execute()
