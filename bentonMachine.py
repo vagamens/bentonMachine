@@ -54,10 +54,57 @@ class BrookshearMachine():
 		ADD the bit patterns in registers S & T as though they were two's
 		complement representation & leave the result in register R
 		'''
-		temp = s + t
-		if temp > 255:
-			temp = 0
-		self.registers[str(r)] = temp
+		if self.ir[0] == 5:
+			temp = s + t
+			if temp > 255:
+				temp = 0
+		elif self.ir[0] == 6:
+			## floating add
+			s = str(bin(self.registers[s]))[2:]
+			t = str(bin(self.registers[t]))[2:]
+			spos = True
+			tpos = True
+			sshift = 0
+			tshift = 0
+			svalue = 0.0
+			tvalue = 0.0
+			if s[0] == '1':
+				spos = False
+			if t[0] == '1':
+				tpos = False
+			if s[2] == '1':
+				sshift+=2
+			if s[3] == '1':
+				sshift+=1
+			if t[2] == '1':
+				tshift+=2
+			if t[3] == '1':
+				tshift+=1
+			if s[1] == '0':
+				sshift *= -1
+			if t[1] == '0':
+				tshift *= -1
+			if s[-4:] == '0000':
+				s = 0
+			if s[-4] == '1' :
+				svalue = (1/2)
+			if s[-3] == '1':
+				svalue += (1/4)
+			if s[-2] == '1':
+				svalue += (1/8)
+			if s[-1] == '1':
+				svalue += (1/16)
+			if s[-4] == '1':
+				t = '.' + s[-4:]
+			if t[-3] == '1':
+				tvalue += (1/4)
+			if t[-2] == '1':
+				tvalue += (1/8)
+			if t[-1] == '1':
+				tvalue += (1/16)
+			svalue = svalue * (2**sshift)
+			tvalue = tvalue * (2**tshift)
+		self.registers[str(r)] = svalue * tvalue
 
 	def bmOr(self, r, s, t):
 		'''
@@ -98,48 +145,52 @@ class BrookshearMachine():
 		the bit pattern in register R is equal to the bit pattern in register 0,
 		otherwise, continue with the normal sequence of execution
 		'''
-		pass
-
-	def halt(self, r, x, y):
-		'''
-		HALT execution
-		'''
-		pass
+		if self.registers[str(r)] == self.registers['0']:
+			self.pc=str(x)+str(y)
 
 	def fetch(self):
-		pass
+		self.ir = self.registers[str(self.pc)]+self.registers[str(self.pc+1)]
 
 	def increment(self):
-		self.ir += 2
-
-	def decode(self):
-		pass
+		self.pc += 2
 
 	def execute(self):
+		## load from memory
 		if self.ir[0] == '1':
-			pass
+			memLoad(self.ir[1], int(str(self.ir[2])+ str(self.ir[3])))
+		## load
 		elif self.ir[0] == '2':
-			pass
+			load(self.ir[1], self.ir[2], self.ir[3])
+		## store
 		elif self.ir[0] == '3':
-			pass
+			store(self.ir[1], self.ir[2], self.ir[3])
+		## move
 		elif self.ir[0] == '4':
-			pass
+			move(self.ir[2], self.ir[3])
+		## add
 		elif self.ir[0] == '5':
-			pass
+			add()
+		## add
 		elif self.ir[0] == '6':
-			pass
+			add()
+		## or
 		elif self.ir[0] == '7':
 			pass
+		## and
 		elif self.ir[0] == '8':
 			pass
+		## exclusive or
 		elif self.ir[0] == '9':
 			pass
+		## rotate
 		elif self.ir[0] == 'A':
 			pass
+		## jump
 		elif self.ir[0] == 'B':
 			pass
+		## halt
 		elif self.ir[0] == 'C':
-			pass
+			return
 		elif self.ir[0] == 'D':
 			pass
 		elif self.ir[0] == 'E':
