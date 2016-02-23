@@ -11,7 +11,6 @@ class BrookshearMachine():
 		self.registers={'0'=0, '1'=0, '2'=0, '3'=0, '4'=0, '5'=0,
 						'6'=0, '7'=0, '8'=0, '9'=0, 'A'=0, 'B'=0,
 						'C'=0, 'D'=0, 'E'=0, 'F'=0}
-		pass
 
 	def setPC(self, value):
 		if value[0] == ['A'-'F'] or value[0] == ['0'-'9']:
@@ -27,8 +26,7 @@ class BrookshearMachine():
 		'''
 		LOAD the register R with bit pattern XY
 		'''
-		self.registers[str(r)] == str(x+y)
-		pass
+		self.registers[str(r)] == str(x)+str(y)
 
 	def memLoad(self, r, x, y):
 		'''
@@ -49,62 +47,15 @@ class BrookshearMachine():
 		self.registers[str(r)] = self.registers[str(s)]
 		self.registers[str(s)] = 0
 
-	def add(self, r, s, t):
+	def add2s(self, r, s, t):
 		'''
 		ADD the bit patterns in registers S & T as though they were two's
 		complement representation & leave the result in register R
 		'''
-		if self.ir[0] == 5:
-			temp = s + t
-			if temp > 255:
-				temp = 0
-		elif self.ir[0] == 6:
-			## floating add
-			s = str(bin(self.registers[s]))[2:]
-			t = str(bin(self.registers[t]))[2:]
-			spos = True
-			tpos = True
-			sshift = 0
-			tshift = 0
-			svalue = 0.0
-			tvalue = 0.0
-			if s[0] == '1':
-				spos = False
-			if t[0] == '1':
-				tpos = False
-			if s[2] == '1':
-				sshift+=2
-			if s[3] == '1':
-				sshift+=1
-			if t[2] == '1':
-				tshift+=2
-			if t[3] == '1':
-				tshift+=1
-			if s[1] == '0':
-				sshift *= -1
-			if t[1] == '0':
-				tshift *= -1
-			if s[-4:] == '0000':
-				s = 0
-			if s[-4] == '1' :
-				svalue = (1/2)
-			if s[-3] == '1':
-				svalue += (1/4)
-			if s[-2] == '1':
-				svalue += (1/8)
-			if s[-1] == '1':
-				svalue += (1/16)
-			if s[-4] == '1':
-				t = '.' + s[-4:]
-			if t[-3] == '1':
-				tvalue += (1/4)
-			if t[-2] == '1':
-				tvalue += (1/8)
-			if t[-1] == '1':
-				tvalue += (1/16)
-			svalue = svalue * (2**sshift)
-			tvalue = tvalue * (2**tshift)
-		self.registers[str(r)] = svalue * tvalue
+		self.registers[str(r)] = s * t
+
+	def addFloat(self, r, s, t):
+		pass
 
 	def bmOr(self, r, s, t):
 		'''
@@ -121,8 +72,8 @@ class BrookshearMachine():
 		'''
 		temp = bin(s) and bin(t)
 		if temp > 255:
-			temp = 0
-		self.registers[str(r)] = temp
+			temp = self
+		0.registers[str(r)] = temp
 
 	def xor(self, r, s, t):
 		'''
@@ -157,22 +108,22 @@ class BrookshearMachine():
 	def execute(self):
 		## load from memory
 		if self.ir[0] == '1':
-			memLoad(self.ir[1], int(str(self.ir[2])+ str(self.ir[3])))
+			self.memLoad(self.ir[1], int(str(self.ir[2])+ str(self.ir[3])))
 		## load
 		elif self.ir[0] == '2':
-			load(self.ir[1], self.ir[2], self.ir[3])
+			self.load(self.ir[1], self.ir[2], self.ir[3])
 		## store
 		elif self.ir[0] == '3':
-			store(self.ir[1], self.ir[2], self.ir[3])
+			self.store(self.ir[1], self.ir[2], self.ir[3])
 		## move
 		elif self.ir[0] == '4':
-			move(self.ir[2], self.ir[3])
+			self.move(self.ir[2], self.ir[3])
 		## add
 		elif self.ir[0] == '5':
-			add()
+			self.add2s(self.ir[1], self.ir[2], self.ir[3])
 		## add
 		elif self.ir[0] == '6':
-			add()
+			self.addFloat()
 		## or
 		elif self.ir[0] == '7':
 			pass
