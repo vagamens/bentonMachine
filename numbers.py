@@ -4,7 +4,22 @@ import numpy as np
 
 class Float8:
 	'''Defines numbers in 8-bit standard notation.'''
+	lookup = [dict(), dict()]
+	# possible lookup table for all the floats
 	def __init__(self, value):
+		for i in range(255):
+			value = ''
+			for j in range(1,8-len(str(i))):
+				value = value+'0'
+			value = value+str(i)
+			num = 0
+			for j in range(7):
+				num+=int(value[j]*(2**(7-j)))
+			isPos = 0 # denotes the *actual* value of the sign bit
+			if value[0] == '1':
+				isPos=1
+			value = value[1:]
+			# convert into to float
 		self.setValue(value)
 
 	def getValue(self, type='num'):
@@ -29,11 +44,11 @@ class Float8:
 			value[0], value[1] = int(value[0]), int(value[1])
 			# value is two ints, around the decimal
 			# check to make sure that the mantissa isn't too large
-			if int(str(value[0])+str(value[1])) > 31:
+			if len(bin(value[0])[2:]+bin(value[1])[2:]) > 5:
 				raise OverflowError
 			else:
-				if len(bin(value[0])[2:]) > 3:
-					raise OverflowError
+				# do some math to change to float to something useful
+				pass
 		elif 'int' in str(type(value)):
 			self.setValue(float(value))
 		elif 'str' in str(type(value)):
