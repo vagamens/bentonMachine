@@ -4,9 +4,8 @@ import numpy as np
 
 class Float8:
 	'''Defines numbers in 8-bit standard notation.'''
-	0001111
 	def __init__(self, value):
-		self.setValue(self, value)
+		self.setValue(value)
 
 	def getValue(self, type='num'):
 		if type == 'num':
@@ -19,23 +18,25 @@ class Float8:
 			return 'Unknown type'
 
 	def setValue(self, value):
-		if 'float' in type(value):
+		if 'float' in str(type(value)):
 			# convert float to int
 			fits = False
+			pos = 0
 			value = str(value).split('.')
-			value[0], value[1] = int(value[0), int(value[1])
+			if value[0][0] == '-':
+				pos = 1
+				value[0] = value[0][1:]
+			value[0], value[1] = int(value[0]), int(value[1])
 			# value is two ints, around the decimal
 			# check to make sure that the mantissa isn't too large
-			if value[0]+value[1] > 31:
-				# too bad
-				pass
+			if int(str(value[0])+str(value[1])) > 31:
+				raise OverflowError
 			else:
-				# check to make sure that the exponent isn't too large
-				# float the shit out of value[0] and concat with value[1]
-				# find out how far the radix point moved
-				# if moved is greater than 3, too bad
-				pass
-		if 'str' in type(value):
+				if len(bin(value[0])[2:]) > 3:
+					raise OverflowError
+		elif 'int' in str(type(value)):
+			self.setValue(float(value))
+		elif 'str' in str(type(value)):
 			# some logic to change hex to float
 			if value[1] == 'x':
 				temp = 0
@@ -46,14 +47,14 @@ class Float8:
 					count+=1
 				value = temp
 			# some logic to change bin to float
-			elif value[] == 'b':
+			elif value[1] == 'b':
 				temp = 0
 				count = 0
 				value = value[2:]
 				for i in ranche(len(value),1,-1):
 					temp += value[count]*(2**(i-1))
 					count+=1
-				value = temp
+				value = bin(temp)[2:]
 		self.value = value
 		self.sign = bin(self.value)[2]
 		self.exponent = bin(self.value)[3:-4]
@@ -102,7 +103,7 @@ class Sign8:
 					temp += value[count]*(16**(i-1))
 					count+=1
 				value = temp
-			elif value[] == 'b':
+			elif value[1] == 'b':
 				temp = 0
 				count = 0
 				value = value[2:]
@@ -153,7 +154,7 @@ class UnSign8:
 					temp += value[count]*(16**(i-1))
 					count+=1
 				value = temp
-			elif value[] == 'b':
+			elif value[1] == 'b':
 				temp = 0
 				count = 0
 				value = value[2:]
