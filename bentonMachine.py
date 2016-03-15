@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 
 import operator
+import numpy as n
+from numbers import sign8, unsign8
 
 class BrookshearMachine():
 
@@ -61,34 +63,27 @@ class BrookshearMachine():
 		'''
 		OR the bit patterns in registers S and t and place the result in register R
 		'''
-		temp = bin(s) or bin(t)
-		if temp > 255:
-			temp = 0
-		self.registers[str(r)] = temp
+		self.registers[str(r)] = n.bitwise_or(s, t)
 
 	def bmAnd(self, r, s, t):
 		'''
 		AND the bit patterns in register S and T and place the result in register R
 		'''
-		temp = bin(s) and bin(t)
-		if temp > 255:
-			temp = self
-		0.registers[str(r)] = temp
+		self.registers[str(r)] = n.bitwise_and(s, t)
 
 	def xor(self, r, s, t):
 		'''
 		XOR the bit patterns in register S and T and place theresult in register R
 		'''
-		temp = operator.xor(s, t)
-		if temp > 255:
-			temp = 0
-		self.registers[str(r)] = temp
+		self.registers[str(r)] = n.bitwise_xor(s, t)
 
 	def rotate(self, r, x):
 		'''
 		ROTATE the bit pattern in register R one bit to the right X times
 		'''
-		pass
+		c = 1
+		while c <= x:
+			self.registers[str(r)] = n.right_shift(self.registers[str(r)]
 
 	def jump(self, r, x, y):
 		'''
@@ -123,16 +118,17 @@ class BrookshearMachine():
 			self.add2s(self.ir[1], self.ir[2], self.ir[3])
 		## add
 		elif self.ir[0] == '6':
-			self.addFloat()
+			## not yet implemented
+			self.addFloat(self.ir[1], self.ir[2], self.ir[3])
 		## or
 		elif self.ir[0] == '7':
-			pass
+			self.bmOr(self.ir[1], self.ir[2], self.ir[3])
 		## and
 		elif self.ir[0] == '8':
-			pass
+			self.bmAnd(self.ir[1], self.ir[2], self.ir[3])
 		## exclusive or
 		elif self.ir[0] == '9':
-			pass
+			self.xor(self.ir[1], self.ir[2], self.ir[3])
 		## rotate
 		elif self.ir[0] == 'A':
 			pass

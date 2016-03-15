@@ -19,8 +19,13 @@ class Float8:
 			if value[0] == '1':
 				isPos=1
 			value = value[1:]
-			# convert into to float
+			# convert int to float
 		self.setValue(value)
+
+	# generate the lookup table
+	@staticmethod
+	def generate():
+		pass
 
 	def getValue(self, type='num'):
 		if type == 'num':
