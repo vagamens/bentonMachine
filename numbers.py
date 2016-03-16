@@ -1,7 +1,5 @@
 #!/usr/bin/env python2
 
-import numpy as np
-
 class Float8:
 	'''Defines numbers in 8-bit standard notation.
 	   Numbers are input as integers, added and subtracted,
@@ -77,13 +75,8 @@ class Float8:
 			Float8.lookup[1][str(value)] = i
 
 	@staticmethod
-	def add(self, x, y):
+	def add(x, y):
 		z = self.lookup[0][str(x)] + self.lookup[0][str(y)]
-		return Float8.lookup[1][str(z)]
-
-	@staticmethod
-	def sub(self, x, y):
-		z = self.lookup[0][str(x)] - self.lookup[0][str(y)]
 		return Float8.lookup[1][str(z)]
 
 Float8.generate()
@@ -92,25 +85,58 @@ class Sign8:
 	'''Defines numbers in two's compliment.
 	Takes in integers, makes sure that they are 8-bit integers
 	through out the transaction, then returns as an integer.
-	uses numpy int8.'''
+	'''
 	@staticmethod
-	def add(self, x, y):
-		z = np.int8(np.int(x) + np.int(y))
-		return z
-
-	@staticmethod
-	def sub(self, x, y):
-		z = np.int(np.int(x) + np.int(y))
-		return z
-
-class UnSign8:
-	'''Just an unsigned integer. Uses numpy uint8.'''
-	@staticmethod
-	def add(self, x, y):
-		z = np.uint8(np.uint8(x) + np.uint8(y))
-		return z
-
-	@staticmethod
-	def sub(self, x, y):
-		z = np.uint8(np.uint8(x) - np.uint8(y))
+	def add(x, y):
+		# convert 'x' to singed int
+		if bin(x)[2] == '1':
+			# do negative conversion
+			tempX = ''
+			for i in x:
+				if i == '0':
+					tempX = tempX + '1'
+				elif i == '1':
+					tempX = tempX + '0'
+			if x[-1] == '1':
+				x = x[:-1] + '0'
+			tempVal = 0
+			for i in range(len(x)):
+				tempVal += x[i]*(2**(3-i))
+			x = tempVal
+		else:
+			# don't bother
+			pass
+		# covert 'y' to signed int
+		if bin(y)[2] == '1':
+			# do negative conversion
+			tempY = ''
+			for i in y:
+				if i == '0':
+					tempY = tempY + '1'
+				elif i == '1':
+					tempY = tempY + '0'
+			if x[-1] == '1':
+				x = x[:-1] + '0'
+			tempVal = 0
+			for i in range(len(y)):
+				tempVal += y[i]*(2**(3-i))
+			y = tempVal
+		else:
+			# don't bother
+			pass
+		z = bin(x + y)[2:]
+		# covert 'z' to unsigned int
+		# do negative conversion
+		tempZ = ''
+		for i in z:
+			if i == '0':
+				tempZ = tempZ + '1'
+			elif i == '1':
+				tempZ = tempZ + '0'
+		if z[-1] == '1':
+			z = z[:-1] + '0'
+		tempVal = 0
+		for i in range(len(z)):
+			tempVal += int(z[i])*(2**(3-i))
+		z = tempVal
 		return z
