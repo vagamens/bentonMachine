@@ -3,202 +3,114 @@
 import numpy as np
 
 class Float8:
-	'''Defines numbers in 8-bit standard notation.'''
+	'''Defines numbers in 8-bit standard notation.
+	   Numbers are input as integers, added and subtracted,
+	   then returned as integers.'''
 	lookup = [dict(), dict()]
-	# possible lookup table for all the floats
-	def __init__(self, value):
-		for i in range(255):
-			value = ''
-			for j in range(1,8-len(str(i))):
-				value = value+'0'
-			value = value+str(i)
-			num = 0
-			for j in range(7):
-				num+=int(value[j]*(2**(7-j)))
-			isPos = 0 # denotes the *actual* value of the sign bit
-			if value[0] == '1':
-				isPos=1
-			value = value[1:]
-			# convert int to float
-		self.setValue(value)
 
 	# generate the lookup table
 	@staticmethod
 	def generate():
-		pass
-
-	def getValue(self, type='num'):
-		if type == 'num':
-			return self.value
-		elif type == 'bin':
-			return '0b'+self.sign+self.exponent+self.mantissa
-		elif type == 'hex':
-			return hex(self.value)
-		else:
-			return 'Unknown type'
-
-	def setValue(self, value):
-		if 'float' in str(type(value)):
-			# convert float to int
-			fits = False
-			pos = 0
-			value = str(value).split('.')
-			if value[0][0] == '-':
-				pos = 1
-				value[0] = value[0][1:]
-			value[0], value[1] = int(value[0]), int(value[1])
-			# value is two ints, around the decimal
-			# check to make sure that the mantissa isn't too large
-			if len(bin(value[0])[2:]+bin(value[1])[2:]) > 5:
-				raise OverflowError
+		for i in range(8,255):
+			bitString = bin(i)[2:]
+			sign = int(bitString[0])
+			exponent = bitString[1:4]
+			mantissa = bitString[4:]
+			preRad = []
+			postRad = []
+			for j in mantissa:
+				postRad.append
+			# set numbers for the exponent
+			# one is negative, 0 is positive
+			if exponent == '111':
+				exponent = [0, 3]
+			elif exponent == '110':
+				exponent = [0, 2]
+			elif exponent == '101':
+				exponent = [0, 1]
+			elif exponent == '100':
+				exponent = [0, 0]
+			elif exponent == '011':
+				exponent = [1, 1]
+			elif exponent == '010':
+				exponent = [1, 2]
+			elif exponent == '001':
+				exponent = [1, 3]
+			elif exponent == '000':
+				exponent = [1, 4]
+			# set the postRad values
+			for i in mantissa:
+				postRad.append(int(i))
+			# set the decimal values
+			if exponent[0] == 1:
+				for i in range(1,exponent[1]):
+					tempPostRad = [0]
+					for j in postRad:
+						tempPostRad.append(j)
+					postRad = tempPostRad
+			elif exponent[0] == 0:
+				for i in range(1,exponent[1]):
+					if postRad == []:
+						preRad.append(0)
+					else:
+						preRad.append(postRad.pop(0))
+			# calculate whole numbers
+			if preRad == []:
+				preRad = 0
 			else:
-				# do some math to change to float to something useful
-				pass
-		elif 'int' in str(type(value)):
-			self.setValue(float(value))
-		elif 'str' in str(type(value)):
-			# some logic to change hex to float
-			if value[1] == 'x':
-				temp = 0
-				count = 0
-				value = value[2:]
-				for i in range(len(value),1,-1):
-					temp += value[count]*(16**(i-1))
-					count+=1
-				value = temp
-			# some logic to change bin to float
-			elif value[1] == 'b':
-				temp = 0
-				count = 0
-				value = value[2:]
-				for i in ranche(len(value),1,-1):
-					temp += value[count]*(2**(i-1))
-					count+=1
-				value = bin(temp)[2:]
-		self.value = value
-		self.sign = bin(self.value)[2]
-		self.exponent = bin(self.value)[3:-4]
-		self.mantissa = bin(self.value)[-4:]
+				tempVal = 0
+				for i in range(len(preRad)):
+					tempVal += preRad[i]*(2**(3-i))
+				preRad = tempVal
+			# calculate decimal values
+			if postRad == []:
+				postRad = 0
+			else:
+				tempVal = 0
+				for i in range(len(postRad)):
+					tempVal += postRad[i]*(1/(2**(i+1)))
+				postRad = tempVal
+			## add 'em up and find the negative
+			value = (-1)*sign*(preRad + postRad)
+			## add the value to the lookup tables
+			Float8.lookup[0][str(i)] = value
+			Float8.lookup[1][str(value)] = i
 
-	def getNum(self):
-		return self.getValue(type='num')
+	@staticmethod
+	def add(self, x, y):
+		z = self.lookup[0][str(x)] + self.lookup[0][str(y)]
+		return Float8.lookup[1][str(z)]
 
-	def getHex(self):
-		return self.getValue(type='hex')
+	@staticmethod
+	def sub(self, x, y):
+		z = self.lookup[0][str(x)] - self.lookup[0][str(y)]
+		return Float8.lookup[1][str(z)]
 
-	def getBin(self):
-		return self.getValue(type='bin')
-
-	def isPositive(self):
-		if self.sign == '1':
-			return True
-		elif self.sign == '0':
-			return False
-
-	def getMentassa(self):
-		return 'b'+self.mentassa
-
-	def getSign(self):
-		return 'b'+self.sign
-
-	def getExponent(self):
-		return 'b'+self.exponent
+Float8.generate()
 
 class Sign8:
-	'''Defines numbers in two's compliment. Uses numpy int8.'''
-	def __init__(self, value):
-		self.setValue(value)
+	'''Defines numbers in two's compliment.
+	Takes in integers, makes sure that they are 8-bit integers
+	through out the transaction, then returns as an integer.
+	uses numpy int8.'''
+	@staticmethod
+	def add(self, x, y):
+		z = np.int8(np.int(x) + np.int(y))
+		return z
 
-	def setValue(self, value):
-		if 'str' in type(value):
-			isPos = 1
-			if value[0] == '-':
-				isPos = -1
-				value = value[1:]
-			if value[1] == 'x':
-				temp = 0
-				count = 0
-				value = value[2:]
-				for i in range(len(value),1,-1):
-					temp += value[count]*(16**(i-1))
-					count+=1
-				value = temp
-			elif value[1] == 'b':
-				temp = 0
-				count = 0
-				value = value[2:]
-				for i in ranche(len(value),1,-1):
-					temp += value[count]*(2**(i-1))
-					count+=1
-				value = temp
-			value = value*isPos
-		self.value = np.int8(value)
-
-	def getValue(self, type='num'):
-		if type == 'num':
-			return self.value
-		elif type == 'hex':
-			return hex(int('b'+self.bitString))
-		elif type == 'bin':
-			return self.bitString
-		else:
-			return 'Unknown type'
-
-	def getNum(self):
-		return getValue(type='num')
-
-	def getHex(self):
-		return getValue(type='hex')
-
-	def getBin(self):
-		return getValue(type='bin')
-
-	def isPositive(self):
-		if self.sign == '0':
-			return True
-		else:
-			return False
+	@staticmethod
+	def sub(self, x, y):
+		z = np.int(np.int(x) + np.int(y))
+		return z
 
 class UnSign8:
 	'''Just an unsigned integer. Uses numpy uint8.'''
-	def __init__(self, value):
-		self.setValue(value)
+	@staticmethod
+	def add(self, x, y):
+		z = np.uint8(np.uint8(x) + np.uint8(y))
+		return z
 
-	def setValue(self, value):
-		if 'str' in type(value):
-			if value[1] == 'x':
-				temp = 0
-				count = 0
-				value = value[2:]
-				for i in range(len(value),1,-1):
-					temp += value[count]*(16**(i-1))
-					count+=1
-				value = temp
-			elif value[1] == 'b':
-				temp = 0
-				count = 0
-				value = value[2:]
-				for i in ranche(len(value),1,-1):
-					temp += value[count]*(2**(i-1))
-					count+=1
-				value = temp
-		self.value = np.uint8(value)
-
-	def getValue(self, type='num'):
-		if type == 'num':
-			return self.value
-		elif type == 'bin':
-			return bin(self.value)
-		elif type == 'hex':
-			return hex(self.value)
-		else:
-			return 'Unknown type'
-
-	def getNum(self):
-		return self.getValue(type='num')
-
-	def getHex(self):
-		return self.getValue(type='hex')
-
-	def getBin(self):
-		return self.getValue(type='bin')
+	@staticmethod
+	def sub(self, x, y):
+		z = np.uint8(np.uint8(x) - np.uint8(y))
+		return z

@@ -2,17 +2,21 @@
 
 import operator
 import numpy as n
-from numbers import sign8, unsign8
+from numbers import Sign8, Unsign8, Float8
 
 class BrookshearMachine():
 
-	def __init__(self):
+	def __init__(self, memList=[]):
+		self.complete = False
 		self.pc= ''
 		self.ir=''
-		self.memory=dict()
-		self.registers={'0'=0, '1'=0, '2'=0, '3'=0, '4'=0, '5'=0,
-						'6'=0, '7'=0, '8'=0, '9'=0, 'A'=0, 'B'=0,
-						'C'=0, 'D'=0, 'E'=0, 'F'=0}
+		self.setMemory(memList)
+		self.registers={'0':0, '1':0, '2':0, '3':0, '4':0, '5':0,
+						'6':0, '7':0, '8':0, '9':0, 'A':0, 'B':0,
+						'C':0, 'D':0, 'E':0, 'F':0}
+
+	def setMemory(self, memList):
+		self.memory = memList
 
 	def setPC(self, value):
 		if value[0] == ['A'-'F'] or value[0] == ['0'-'9']:
@@ -57,7 +61,7 @@ class BrookshearMachine():
 		self.registers[str(r)] = s * t
 
 	def addFloat(self, r, s, t):
-		pass
+		self.registers[str(r)] = Float8.add(s, t)
 
 	def bmOr(self, r, s, t):
 		'''
@@ -83,7 +87,7 @@ class BrookshearMachine():
 		'''
 		c = 1
 		while c <= x:
-			self.registers[str(r)] = n.right_shift(self.registers[str(r)]
+			self.registers[str(r)] = n.right_shift(self.registers[str(r)])
 
 	def jump(self, r, x, y):
 		'''
@@ -118,7 +122,6 @@ class BrookshearMachine():
 			self.add2s(self.ir[1], self.ir[2], self.ir[3])
 		## add
 		elif self.ir[0] == '6':
-			## not yet implemented
 			self.addFloat(self.ir[1], self.ir[2], self.ir[3])
 		## or
 		elif self.ir[0] == '7':
@@ -136,8 +139,8 @@ class BrookshearMachine():
 		elif self.ir[0] == 'B':
 			pass
 		## halt
-		elif self.ir[0] == 'C':
-			return
+		elif self.ir[0] == 'C' or self.ir[0] == '0':
+			self.complete = True
 		elif self.ir[0] == 'D':
 			pass
 		elif self.ir[0] == 'E':
@@ -151,3 +154,4 @@ class BrookshearMachine():
 		self.increment()
 		self.decode()
 		self.execute()
+		return not self.complete
